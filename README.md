@@ -40,7 +40,6 @@ Positionnement :
 - Configs proches
 - Services : presque partout `systemd`
 
----
 
 ## Back to basics 
 
@@ -52,7 +51,6 @@ Quelle est la différence fondamentale entre du code qui tourne en mode kernel/s
 - Mode user : accès restreint et protégé
 - Séparation = stabilité + sécurité
 
----
 
 ## Qui est où ?
 
@@ -66,7 +64,6 @@ Indiquez, en quelques mots, pour ces répertoires, ce qu'ils sont supposés cont
 - `/var/log` : logs
 - `/var/lib` : données internes des services
 
----
 
 ## Où est le pilote ?
 
@@ -86,7 +83,6 @@ Comment retrouver, sous GNU/Linux :
   
   journalctl -k : affiche les logs du noyau enregistrés par systemd-journald, y compris les messages des pilotes, avec horodatage et historique persistant entre les redémarrages.
 
----
 
 ## MS Windows
 
@@ -108,7 +104,6 @@ Comment fonctionne en pratique WSL _(Windows Subsystem for Linux)_ ? Que permet-
 - Réseau virtuel
 - Partage fichiers via 9p / intégration FS Windows/Linux
 
----
 
 ## On commence
 
@@ -125,7 +120,6 @@ AllowUsers alice bob
 
 - Activer un firewall
 
----
 
 ## Alerte !
 
@@ -141,7 +135,6 @@ Vérifier l’empreinte de la clé
 
 Si légitime, supprimer l’ancienne : ~/.ssh/known_hosts
 
----
 
 ## Oh les gourmands !
 
@@ -152,7 +145,6 @@ Avec la commande : du -sh /home/* | sort -h
 
 La commane va calculé la taille totale de chaque répertoire personnel dans /home, puis trié les résultats par taille croissante, ce qui permetra d’identifier rapidement quels utilisateurs occupent le plus d’espace disque.
 
----
 
 ## On va aider les devs...
 
@@ -171,7 +163,6 @@ Que faites-vous en pratique en tant qu'administrateur.trice pour commencer ?
   dnf install gcc gcc-c++ make cmake gdb git
 
 
----
 
 ## Qui fait quoi ?
 
@@ -180,60 +171,65 @@ Avec la commande : last et ou lastlog
 
 
 Comment identifier les sessions où un.e utilisateur.trice à utilisé _sudo_ pour avoir les droit d'administration ?
-Avec :
-  -grep sudo /var/log/auth.log
-  -journalctl _COMM=sudo
 
----
+Avec :
+  - grep sudo /var/log/auth.log
+  - journalctl _COMM=sudo
+
 
 ## Post mortem
 
 Le système que vous administrez est tombé cette nuit. Comment récupérer des informations sur ce qui s'est passé ?
-journalctl -b -1
-journalctl -p err
-dmesg
+- journalctl -b -1 : affiche les journaux du système du démarrage précédent, ce qui permet d’analyser ce qui s’est passé avant le crash ou le redémarrage.
 
----
+- journalctl -p err : affiche uniquement les messages de niveau erreur ou plus critique (erreur, critique, alerte, urgence) pour repérer rapidement les problèmes importants.
+
+- dmesg : affiche les messages du noyau Linux en mémoire, notamment ceux liés au matériel, aux pilotes et aux erreurs bas niveau survenues au démarrage ou en cours de fonctionnement.
+
 
 ## On surveille...
 
 Sur un serveur GNU/Linux qui démarre via _systemd_, un service nommé _bidule_, comment :
 
 - Savoir si le service est lancé au démarrage automatiquement
-  systemctl is-enabled bidule
+  
+    systemctl is-enabled bidule
 
 - Savoir s'il est en cours de fonctionnement
-  systemctl status bidule
+  
+    systemctl status bidule
   
 - Faire en sorte qu'il le soit
-  systemctl enable --now bidule
+  
+    systemctl enable --now bidule
 
 - Examiner les messages qu'il émet
-  journalctl -u bidule
+  
+    journalctl -u bidule
 
 - Le redémarrer
-  systemctl restart bidule
+  
+    systemctl restart bidule
 
 - Déterminer de quel paquet (Debian ou Red Hat) il provient
+  
   Debian :
-    -dpkg -S $(which bidule)
+    - dpkg -S $(which bidule)
   
   RedHat :
-    -rpm -qf $(which bidule)
+    - rpm -qf $(which bidule)
 
----
 
 ## Zut
 
 Vous devez reprendre la main, en tant qu'administrateur, d'un système GNU/Linux mais vous n'avez aucun mot de passe à votre disposition, ni _root_ ni utilisateur. Que pouvez-vous faire ?
 Solution :
 
-  -Démarrer en mode recovery / single user
-  -Monter la racine en RW
-  -Changer le mot de passe :
+  - Démarrer en mode recovery / single user
+  - Monter la racine en RW
+  - Changer le mot de passe :
       passwd
 
----
 
 ## C'est la faute à Rémy
 
@@ -241,28 +237,27 @@ Un service réseau http(s) ne fonctionne plus. Vous avez accès à ce système c
 
 Outils de diagnostic
 
-Service :
-  -systemctl status apache2
-  -systemctl status nginx
+### Service :
+  - systemctl status apache2   : Affiche l’état du service Apache2 (démarré, arrêté, en erreur…).
+  - systemctl status nginx    : Indique si Nginx est actif, en panne ou en cours de redémarrage.
 
-Logs :
-  -journalctl
-  -tail -f /var/log/apache2/error.log
+### Logs :
+  - journalctl     : Affiche les logs du système gérés par systemd.
+  - tail -f /var/log/apache2/error.log    : Affiche en continu les dernières lignes du fichier de logs d’erreur d’Apache.
 
-Ports :
-  -ss -lntup
+### Ports :
+  - ss -lntup     : Affiche les ports ouverts et les services qui les utilisent.
 
-Test HTTP :
-  -curl http://localhost
+### Test HTTP :
+  - curl http://localhost      : Effectue une requête HTTP vers le serveur local.
 
-Processus :
-  -ps aux
-  -lsof -i
+### Processus :
+  - ps aux     : Liste tous les processus en cours avec :
+  - lsof -i     : Liste les fichiers ouverts liés aux connexions réseau (sockets). Permet de savoir quel processus écoute sur quel port, très utile pour le debugging réseau.
 
-Debug avancé :
-  -strace
+### Debug avancé :
+  - strace     : Trace les appels système d’un processus. Montre en détail ce que le processus fait : ouverture de fichiers, accès réseau, erreurs système.
 
----
 
 ## Au charbon !
 
@@ -270,54 +265,49 @@ On vous demande d'installer un serveur de base de données _Elastic_ (autrefois 
 
 Décrivez votre recherche documentaire, la méthode que vous sélectionnez, les commandes que vous exécutez et les fichiers de configuration impliqués.
 
-Méthode :
-  -Lecture documentation officielle Elastic
-  -Ajout dépôt officiel
-  -Installation du paquet
-  -Configuration
-  -Démarrage du service
+### Méthode :
+  - Lecture documentation officielle Elastic
+  - Ajout dépôt officiel
+  - Installation du paquet
+  - Configuration
+  - Démarrage du service
 
-Fichier principal :
+### Fichier principal :
   /etc/elasticsearch/elasticsearch.yml
 
 Commandes :
-  -systemctl enable --now elasticsearch
-  -curl http://localhost:9200
-
----
+  - systemctl enable --now elasticsearch     : Crée un lien symbolique pour démarrer Elasticsearch automatiquement au boot.
+  - curl http://localhost:9200
 
 ## Le Web
 
 Vous avez la charge de gérer un serveur Web sous Debian GNU/Linux, pour héberger plusieurs sites Web (hébergement mutualisé).
 
 - Quels paquets installez-vous ?
-    apt install apache2
-    apt install php php-fpm php-mysql
-    apt install mariadb-server
+    - apt install apache2
+    - apt install php php-fpm php-mysql
+    - apt install mariadb-server
 
 - Comment organisez sous le stockage des différents contenus ?
-    /var/www/site1
-    /var/www/site2
-    /var/www/site3
+    - /var/www/site1
+    - /var/www/site2
+    - /var/www/site3
 
     
 - Certains sites ont besoin de PHP, comment l'installez-vous ?
-    apt install php php-fpm
+    - apt install php php-fpm
   
 - Comment pouvez-vous organiser l'enregistrement séparé des visites des différents sites ?
-- 
+    - CustomLog /var/log/apache2/site1_access.log
+    - ErrorLog /var/log/apache2/site1_error.log
+  
 On peut organiser l’enregistrement séparé des visites en configurant, pour chaque site (VirtualHost), des fichiers de logs distincts (par exemple avec CustomLog et ErrorLog sous Apache, ou access_log et error_log sous Nginx), afin que chaque site écrive ses accès dans ses propres fichiers.
-
-    CustomLog /var/log/apache2/site1_access.log
-    ErrorLog /var/log/apache2/site1_error.log
-
   
 - Quel(s) outil(s) peuvent vous permettre de fournir une vison des visites de chaque site à chaque Webmaster ?
 
   Statistiques de fréquentation :
-      -AWStats : outil d’analyse de logs web qui génère des rapports statistiques détaillés (visites, pages vues, pays, navigateurs, robots, etc.) à partir des fichiers de journaux du serveur.
-
-      -GoAccess : analyseur de logs web en temps réel qui fournit une vue interactive dans le terminal ou via une interface web sur le trafic, les visiteurs et les performances.
-
-      -Matomo : plateforme complète de web analytics qui fonctionne par suivi via code JavaScript sur les sites (et/ou par analyse de logs) pour fournir des statistiques avancées de fréquentation, de comportement utilisateur et de performance.
+  
+    - AWStats : outil d’analyse de logs web qui génère des rapports statistiques détaillés (visites, pages vues, pays, navigateurs, robots, etc.) à partir des fichiers de journaux du serveur.
+    - GoAccess : analyseur de logs web en temps réel qui fournit une vue interactive dans le terminal ou via une interface web sur le trafic, les visiteurs et les performances.
+    - Matomo : plateforme complète de web analytics qui fonctionne par suivi via code JavaScript sur les sites (et/ou par analyse de logs) pour fournir des statistiques avancées de fréquentation, de comportement utilisateur et de performance.
 
