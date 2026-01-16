@@ -226,7 +226,7 @@ Vous devez reprendre la main, en tant qu'administrateur, d'un système GNU/Linux
 Solution :
 
   - Démarrer en mode recovery / single user
-  - Monter la racine en RW
+  - Monter la racine en RW (Read-Write)
   - Changer le mot de passe :
       passwd
 
