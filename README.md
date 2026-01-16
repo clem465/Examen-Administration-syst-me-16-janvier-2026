@@ -74,8 +74,8 @@ Comment retrouver, sous GNU/Linux :
 - La liste des fichiers binaires _(modules)_ qui les fournissent ?    /lib/modules/$(uname -r)/
 
 - Forcer leur chargement et leur déchargement ?
-  Chargement : modprobe nom_module
-  Déchargement : modprobe -r nom_module
+    - Chargement : modprobe nom_module
+    - Déchargement : modprobe -r nom_module
 
 - Les messages qu'ils ont émis ?
   
